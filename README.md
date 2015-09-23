@@ -5,6 +5,5 @@ The software will show a random choice from your files, and you'll have the opti
 
 Planned Additions
 ------------------
-- CONFIG ( Being able to setup where your files live, rather than have them hardcoded like now. )
-- EXTRA LOCATIONS ( Being able to have multiple locations that can be pulled from and being able to toggle them, right now its just one. )
-  - This includes the ability to choose from TV shows, audiobooks, etc.
+- Maybe add the ability to toggle your sources, so if you only want tv shows, or only movies, etc.
+- More robust code! Right now the code is rather fragile and will crash if just about anything is wrong (especially with the config system), so I'll be aiming to clean up and recover from errors.
