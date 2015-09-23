@@ -1,0 +1,9 @@
+<Config>
+	<Drives>
+		<Drive Name="EXTERNAL">
+			<Dir>Movies</Dir>
+			<Dir>TV Shows</Dir>
+		</Drive>
+	</Drives>
+	<VLCPath>"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc"</VLCPath>
+</Config>
