@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
@@ -17,15 +18,17 @@ namespace MovieSelector.Controller
         Random random = new Random();
 
         IMovieView view;
-        FileSystemInfo[] files;
+        List<FileSystemInfo> files;
         FileSystemInfo currentFile;
+        string vlcPath;
 
-        public MovieController(IMovieView view, FileSystemInfo[] movieFiles)
+        public MovieController(IMovieView view, List<FileSystemInfo> files, string vlcPath)
         {
             this.view = view;
-            this.files = movieFiles;
+            this.files = files;
+            this.vlcPath = vlcPath;
 
-            if(this.files.Length > 0)
+            if(files != null)
             {
                 currentFile = getNextFile();
                 this.view.setViewFilename(currentFile.Name); 
@@ -42,35 +45,19 @@ namespace MovieSelector.Controller
 
         public void tryPlayVideo(bool closeOnComplete)
         {
-            string filenameInsert = "";
-
-            if(currentFile.Attributes == FileAttributes.Directory)
+            if(currentFile.Exists)
             {
-                OpenFileDialog fd = new OpenFileDialog();
-                fd.Multiselect = false;
-                fd.InitialDirectory = currentFile.FullName;
-                DialogResult result = DialogResult.None;
-
-                do
-                {
-                     result = fd.ShowDialog();                    
-                } while(result != DialogResult.OK);
-
-                filenameInsert = "\"" + fd.FileName + "\"";
-            }
-            else
-            {
-                filenameInsert = "\"" + currentFile.FullName + "\"";
-            }
-
-            System.Diagnostics.Process.Start(Program.CONFIG_PATH_TO_VLC, filenameInsert);
+                string filenameInsert = string.Format("\"{0}\"", currentFile.FullName);
+                System.Diagnostics.Process.Start(vlcPath, filenameInsert);
             
-            if (closeOnComplete) System.Environment.Exit(0);
+                if (closeOnComplete) System.Environment.Exit(0);
+            }
         }
 
         private FileSystemInfo getNextFile()
         {
-            return files[random.Next(files.Length)];
+            if (files.Count == 0) return new DirectoryInfo("C:\\");
+            return files[random.Next(files.Count - 1)];
         }
     }
 }

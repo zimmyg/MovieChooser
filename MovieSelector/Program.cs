@@ -1,49 +1,40 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 using MovieSelector.View;
 using MovieSelector.Controller;
+using MovieSelector.Configuration;
 
 namespace MovieSelector
 {
     static class Program
     {
-        public const string CONFIG_DRIVE_NAME = "EXTERNAL";
-        public const string CONFIG_MOVIES_DIRECTORY = "Movies";
-        public const string CONFIG_PATH_TO_VLC = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
+            Config cfg = Config.Load();
+            List<FileSystemInfo> files = new List<FileSystemInfo>();
+            
             MainForm form = new MainForm();
             form.Visible = false;
 
-            FileSystemInfo[] movieFiles = null;
-
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            for (int i = 0; i < drives.Length; i++)
+            foreach (FileSystemInfo fsi in cfg.Directories)
             {
-                if (drives[i].IsReady && drives[i].VolumeLabel.Equals(CONFIG_DRIVE_NAME))
+                if(fsi.Exists)
                 {
-                    DirectoryInfo[] rootDirFiles = drives[i].RootDirectory.GetDirectories(CONFIG_MOVIES_DIRECTORY);
-                    for (int j = 0; j < rootDirFiles.Length; j++)
+                    FileSystemInfo[] dirFiles = ((DirectoryInfo)fsi).GetFileSystemInfos();
+                    foreach(FileSystemInfo f in dirFiles)
                     {
-                        if(rootDirFiles[j].Name.Equals(CONFIG_MOVIES_DIRECTORY))
-                        {
-                            movieFiles = rootDirFiles[j].GetFileSystemInfos();
-                            break;
-                        } 
+                        files.Add(f);
                     }
-                    if (movieFiles != null) break;
                 }
             }
 
-            if (movieFiles == null) System.Environment.Exit(-1);
-
-            MovieController controller = new MovieController(form, movieFiles);
+            MovieController controller = new MovieController(form, files, cfg.VLCPath);
 
             form.ShowDialog();
         }
